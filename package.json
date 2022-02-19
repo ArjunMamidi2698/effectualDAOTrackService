@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,10 @@
   "homepage": "https://github.com/ArjunMamidi2698/effectualDAOTrackService#readme",
   "dependencies": {
     "@aragon/connect": "^0.7.0",
+    "@aragon/connect-thegraph-token-manager": "^0.3.0",
+    "@aragon/connect-thegraph-tokens": "^0.4.2",
     "@aragon/connect-thegraph-voting": "^0.4.2",
+    "@aragon/connect-tokens": "^0.7.0",
     "body-parser": "^1.19.2",
     "circular-json": "^0.5.9",
     "cookie-parser": "^1.4.6",

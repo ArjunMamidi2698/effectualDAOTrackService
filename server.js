@@ -8,13 +8,17 @@ const server = require("http").createServer(app);
 const CircularJSON = require("circular-json");
 const {
 	getOrg,
-	getAppsByName,
+	getAppByName,
 	getAppsByAddress,
-	getVotingAddress,
 	getApps,
 	getVotes,
 	processVote,
+	initAppsTracker,
+	initVotesTracker,
+	getToken,
+	getTokenHolders,
 } = require("./services/trackApp.service");
+const { addLog } = require("./helpers");
 
 const port = process.env.SERVER_PORT || process.env.PORT || 2022;
 
@@ -36,35 +40,36 @@ function handleJSONResponse(res, data) {
 
 app.get("/", async (req, res) => {
 	const org = await getOrg();
-	console.log(org);
 	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(org)));
 });
 app.get("/apps", async (req, res) => {
 	let apps = [];
 	var name = req.query["name"];
 	var address = req.query["address"];
-	if (name && name.trim() != "") apps = await getAppsByName(name);
+	if (name && name.trim() != "") apps = await getAppByName(name);
 	else if (address && address.trim() != "")
 		apps = await getAppsByAddress(address);
 	else apps = await getApps();
-	// console.log(apps);
 	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(apps)));
-});
-app.get("/votingAppAddress", async (req, res) => {
-	const votingAppAddress = await getVotingAddress();
-	// console.log(votingAppAddress);
-	handleJSONResponse(res, { votingAppAddress: votingAppAddress });
 });
 app.get("/votes", async (req, res) => {
 	const votes = await getVotes();
-	console.log(votes);
 	const processedVotes = await Promise.all(
 		votes.map(async (vote) => processVote(vote))
 	);
 	processedVotes.reverse();
 	handleJSONResponse(res, processedVotes);
 });
-
+app.get("/token", async (req, res) => {
+	const token = await getToken();
+	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(token)));
+});
+app.get("/token-holders", async (req, res) => {
+	const tokenHolders = await getTokenHolders();
+	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(tokenHolders)));
+});
+// initAppsTracker();
+// initVotesTracker();
 
 // Server listening
 server.listen(port, () => {

@@ -1,39 +1,85 @@
+const { addLog } = require("../helpers");
 const {
 	connectToOrg,
 	getVotingInstance,
 	describeScript,
 	EMPTY_SCRIPT,
+	getAppsHandler,
+	getVotesHandler,
+	handlerUnsubscribe,
+	getTokenManagerInstance,
 } = require("./dao.service");
 
 let org = null; // cache
+let token = null; // cache
 const getOrg = async () => {
-	if (org == null) org = await connectToOrg();
+	if (org == null) {
+		org = await connectToOrg();
+		addLog(
+			"New Conenction to the Org: " +
+				(org.connection?.orgLocation
+					? org.connection.orgLocation
+					: org.connection.orgAddress)
+		);
+	} else {
+		addLog(
+			"Fetching Org from cache: " +
+				(org.connection?.orgLocation
+					? org.connection.orgLocation
+					: org.connection.orgAddress)
+		);
+	}
 	return org;
+};
+const getToken = async () => {
+	// AJ - TODO - CHECK THIS CASE
+	// if( token != null ) return token;
+	const tokensAppAddress = await getAppAddress("token-manager");
+	const tokenManager = getTokenManagerInstance(tokensAppAddress, true);
+	const token = await tokenManager.token();
+	addLog("Token: " + JSON.stringify( token ));
+	return token;
+};
+const getTokenHolders = async () => {
+	// console.log("\nHolders:");
+	// const token = await getToken();
+	// const holders = await token.holders();
+	// console.log(holders);
+	// return holders;
+	return null;
 };
 const getApps = async () => {
 	const org = await getOrg();
 	const apps = await org.apps();
+	addLog("Fetched apps: " + apps.length);
 	return apps;
 };
-const getAppsByName = async (name) => {
+const getAppByName = async (name) => {
 	const org = await getOrg();
 	const app = await org.app(name);
+	addLog("Fetched app by name(" + name + "): " + JSON.stringify(app));
 	return app;
 };
 const getAppsByAddress = async (address) => {
 	const org = await getOrg();
 	const app = await org.app(address);
+	addLog("Fetched app by address(" + address + "): " + JSON.stringify(app));
 	return app;
 };
-const getVotingAddress = async () => {
-	const org = await getOrg();
-	const { address: votingAppAddress } = await org.app("voting");
-	return votingAppAddress;
+const getAppAddress = async (name) => {
+	try {
+		const { address: appAddress } = await getAppByName(name);
+		addLog("App address for " + name + ": " + appAddress);
+		return appAddress;
+	} catch (err) {
+		return { error: err.message };
+	}
 };
 const getVotes = async () => {
-	const votingAppAddress = await getVotingAddress();
+	const votingAppAddress = await getAppAddress("voting");
 	const voting = getVotingInstance(votingAppAddress, true);
 	const votes = await voting.votes();
+	addLog("Fetched votes: " + votes.length);
 	return votes;
 };
 const processVote = async (vote) => {
@@ -48,11 +94,28 @@ const processVote = async (vote) => {
 		return vote;
 	}
 };
+const initAppsTracker = async () => {
+	const org = await getOrg();
+	getAppsHandler(org).then((apps) => {
+		console.log(apps);
+		addLog("Apps updated: " + apps.length);
+	});
+};
+const initVotesTracker = async () => {
+	const org = await getOrg();
+	getVotesHandler(org).then((votes) => {
+		console.log(votes);
+		addLog("Votes updated: " + votes.length);
+	});
+};
 
 module.exports.getOrg = getOrg;
 module.exports.getApps = getApps;
-module.exports.getAppsByName = getAppsByName;
+module.exports.getAppByName = getAppByName;
 module.exports.getAppsByAddress = getAppsByAddress;
-module.exports.getVotingAddress = getVotingAddress;
+module.exports.getToken = getToken;
+module.exports.getTokenHolders = getTokenHolders;
 module.exports.getVotes = getVotes;
 module.exports.processVote = processVote;
+module.exports.initAppsTracker = initAppsTracker;
+module.exports.initVotesTracker = initVotesTracker;

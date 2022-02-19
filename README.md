@@ -33,7 +33,7 @@ If the installation was successful, you should be able to run the following comm
 -   Launch app and create a token for the organisation and respective token holders who participate in voting/decisions for the organisation
 -   Create a sample vote which would be used to track through our api service below.
 -   see [Aragon guide](https://help.aragon.org/collection/1-aragon-user-guide) for more information
-
+-   Existing App( DAO_ADDRESS=effectual.aragonid.eth ) -> [Effectual]( https://client.aragon.org/#/effectual.aragonid.eth )
 ## Concepts involved
 
 -   DAO( Decentralized Autonomous Organization )
@@ -58,7 +58,9 @@ $ cd effectualDAOTrackService
 ```
    SERVER_PORT=<port> // server listents to this port
    DAO_ADDRESS=<DAO_ADDRESS> // org location/name( example: "effectual.aragonid.eth" ) or address for dao( we can get from organisation settings from the aragon app )
+   NETWORK_ID=<NETWORK_ID> // 4 for rinkeby testnet
    VOTING_SUBGRAPH_URL=<VOTING_SUBGRAPH_URL> // subgraph url related voting app ( https://api.thegraph.com/subgraphs/name/aragon/aragon-voting-rinkeby )
+   TOKEN_MANAGER_SUBGRAPH_URL=<TOKEN_MANAGER_SUBGRAPH_URL> // subgraph related to tokens app( https://api.thegraph.com/subgraphs/name/aragon/aragon-tokens-rinkeby )
 ```
 
 ### Install packages and Start application
@@ -67,6 +69,10 @@ $ cd effectualDAOTrackService
 $ npm i
 
 $ npm run start
+```
+For devlopement
+```
+$ npm run dev
 ```
 
 ## Api's exposed:
