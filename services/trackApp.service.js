@@ -32,21 +32,19 @@ const getOrg = async () => {
 	return org;
 };
 const getToken = async () => {
-	// AJ - TODO - CHECK THIS CASE
-	// if( token != null ) return token;
+	if (token != null) return token;
 	const tokensAppAddress = await getAppAddress("token-manager");
 	const tokenManager = getTokenManagerInstance(tokensAppAddress, true);
-	const token = await tokenManager.token();
-	addLog("Token: " + JSON.stringify( token ));
+	token = await tokenManager.token();
+	token._connector = tokenManager._connector;
+	addLog("Token: " + JSON.stringify(token));
 	return token;
 };
 const getTokenHolders = async () => {
-	// console.log("\nHolders:");
-	// const token = await getToken();
-	// const holders = await token.holders();
-	// console.log(holders);
-	// return holders;
-	return null;
+	if (token != null) token = await getToken();
+	const holders = await token.holders();
+	addLog("TokenHolders: " + JSON.stringify(holders));
+	return holders;
 };
 const getApps = async () => {
 	const org = await getOrg();

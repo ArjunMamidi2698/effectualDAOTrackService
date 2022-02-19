@@ -1,6 +1,6 @@
 const { connect, describeScript } = require("@aragon/connect");
 const { Voting } = require("@aragon/connect-thegraph-voting"); // AJ - TODO - @aragon/connect-voting
-const { TokenManager } = require("@aragon/connect-thegraph-tokens");
+const { TokenManager } = require("@aragon/connect-thegraph-token-manager");
 require("dotenv").config({ path: "../.env" });
 
 // Empty script; votes that do not execute any actions will contain this.

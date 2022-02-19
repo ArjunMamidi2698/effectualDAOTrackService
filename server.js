@@ -18,7 +18,6 @@ const {
 	getToken,
 	getTokenHolders,
 } = require("./services/trackApp.service");
-const { addLog } = require("./helpers");
 
 const port = process.env.SERVER_PORT || process.env.PORT || 2022;
 
