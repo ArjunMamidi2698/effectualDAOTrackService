@@ -4,8 +4,17 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const server = require("http").createServer(app);
-const CircularJSON = require("circular-json");
 
+const CircularJSON = require("circular-json");
+const {
+	getOrg,
+	getAppsByName,
+	getAppsByAddress,
+	getVotingAddress,
+	getApps,
+	getVotes,
+	processVote,
+} = require("./services/trackApp.service");
 
 const port = process.env.SERVER_PORT || process.env.PORT || 2022;
 
@@ -26,8 +35,36 @@ function handleJSONResponse(res, data) {
 }
 
 app.get("/", async (req, res) => {
-	handleJSONResponse(res, JSON.parse(CircularJSON.stringify({"res": "sample response"})));
+	const org = await getOrg();
+	console.log(org);
+	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(org)));
 });
+app.get("/apps", async (req, res) => {
+	let apps = [];
+	var name = req.query["name"];
+	var address = req.query["address"];
+	if (name && name.trim() != "") apps = await getAppsByName(name);
+	else if (address && address.trim() != "")
+		apps = await getAppsByAddress(address);
+	else apps = await getApps();
+	// console.log(apps);
+	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(apps)));
+});
+app.get("/votingAppAddress", async (req, res) => {
+	const votingAppAddress = await getVotingAddress();
+	// console.log(votingAppAddress);
+	handleJSONResponse(res, { votingAppAddress: votingAppAddress });
+});
+app.get("/votes", async (req, res) => {
+	const votes = await getVotes();
+	console.log(votes);
+	const processedVotes = await Promise.all(
+		votes.map(async (vote) => processVote(vote))
+	);
+	processedVotes.reverse();
+	handleJSONResponse(res, processedVotes);
+});
+
 
 // Server listening
 server.listen(port, () => {

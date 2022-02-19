@@ -1,4 +1,4 @@
-# effectualDAOTrackService
+# EffectualDAOTrackService
 
 Api service to track a DAO
 
@@ -25,13 +25,15 @@ If the installation was successful, you should be able to run the following comm
     6.12.0
 
 ### DAO created using [aragon](https://client.aragon.org/#/)
-- Create a organisation in aragon client
-- Choose a template
-- Claim a name
-- Configure your organisation with required actions
-- Launch app and create a token for the organisation and respective token holders who participate in voting/decisions for the organisation
-- Create a sample vote which would be used to track through our api service below.
-- see [Aragon guide](https://help.aragon.org/collection/1-aragon-user-guide) for more information
+
+-   Create a organisation in aragon client
+-   Choose a template
+-   Claim a name
+-   Configure your organisation with required actions
+-   Launch app and create a token for the organisation and respective token holders who participate in voting/decisions for the organisation
+-   Create a sample vote which would be used to track through our api service below.
+-   see [Aragon guide](https://help.aragon.org/collection/1-aragon-user-guide) for more information
+
 ## Concepts involved
 
 -   DAO( Decentralized Autonomous Organization )
@@ -39,9 +41,9 @@ If the installation was successful, you should be able to run the following comm
 -   Fetch Apps in organisation
 -   Fetch Votes from Voting app
 
-## steps to run
+## Steps to run
 
-### clone application
+### Clone application
 
 ```
 $ git clone https://github.com/ArjunMamidi2698/effectualDAOTrackService.git
@@ -54,13 +56,33 @@ $ cd effectualDAOTrackService
 -   After above steps create .env file in this path `effectualDAOTrackService/.env`
 
 ```
-   SERVER_PORT=<port>
+   SERVER_PORT=<port> // server listents to this port
+   DAO_ADDRESS=<DAO_ADDRESS> // org location/name( example: "effectual.aragonid.eth" ) or address for dao( we can get from organisation settings from the aragon app )
+   VOTING_SUBGRAPH_URL=<VOTING_SUBGRAPH_URL> // subgraph url related voting app ( https://api.thegraph.com/subgraphs/name/aragon/aragon-voting-rinkeby )
 ```
 
-### install packages and start application
+### Install packages and Start application
 
 ```
 $ npm i
 
 $ npm run start
+```
+
+## Api's exposed:
+
+server port in the .env file should match the curl request port
+
+```
+    - curl http://localhost:2022/
+        - retrieves organisation info for the given DAO_ADDRESS
+    - curl http://localhost:2022/apps
+        - retrieves all apps info of the organisation
+    - curl http://localhost:2022/apps?name=<appName>
+        - retrieves apps info filtered by name( voting, finance, ... )
+    - curl http://localhost:2022/apps?address=<appAddress>
+        - retrieves apps info filtered by app address
+    - curl http://localhost:2022/votes
+        - retrieves votes info from voting app
+
 ```
