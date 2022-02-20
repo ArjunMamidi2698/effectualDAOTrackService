@@ -88,5 +88,9 @@ server port in the .env file should match the curl request port
         - retrieves apps info filtered by app address
     - curl http://localhost:2022/votes
         - retrieves votes info from voting app
+    - curl http://localhost:2022/token
+        - retrieves token info for the organization from tokens app
+    - curl http://localhost:2022/token-holders
+        - retrieves token holders info
 
 ```
