@@ -27,8 +27,8 @@
   "homepage": "https://github.com/ArjunMamidi2698/effectualDAOTrackService#readme",
   "dependencies": {
     "@aragon/connect": "^0.7.0",
-    "@aragon/connect-thegraph-token-manager": "^0.3.0",
-    "@aragon/connect-thegraph-voting": "^0.4.2",
+    "@aragon/connect-tokens": "^0.7.0",
+    "@aragon/connect-voting": "^0.8.0-alpha.10",
     "body-parser": "^1.19.2",
     "circular-json": "^0.5.9",
     "cookie-parser": "^1.4.6",

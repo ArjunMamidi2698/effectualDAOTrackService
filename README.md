@@ -59,8 +59,6 @@ $ cd effectualDAOTrackService
    SERVER_PORT=<port> // server listents to this port
    DAO_ADDRESS=<DAO_ADDRESS> // org location/name( example: "effectual.aragonid.eth" ) or address for dao( we can get from organisation settings from the aragon app )
    NETWORK_ID=<NETWORK_ID> // 4 for rinkeby testnet
-   VOTING_SUBGRAPH_URL=<VOTING_SUBGRAPH_URL> // subgraph url related voting app ( https://api.thegraph.com/subgraphs/name/aragon/aragon-voting-rinkeby )
-   TOKEN_MANAGER_SUBGRAPH_URL=<TOKEN_MANAGER_SUBGRAPH_URL> // subgraph related to tokens app( https://api.thegraph.com/subgraphs/name/aragon/aragon-tokens-rinkeby )
 ```
 
 ### Install packages and Start application

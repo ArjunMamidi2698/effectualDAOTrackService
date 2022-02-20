@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const server = require("http").createServer(app);
+require("dotenv").config({ path: "./.env" });
 
 const CircularJSON = require("circular-json");
 const {
