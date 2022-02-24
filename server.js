@@ -14,11 +14,15 @@ const {
 	getApps,
 	getVotes,
 	processVote,
-	initAppsTracker,
-	initVotesTracker,
 	getToken,
 	getTokenHolders,
 } = require("./services/trackApp.service");
+const { addLog } = require("./helpers");
+const {
+	initVotesTracker,
+	initAppsTracker,
+	initTokenHoldersTracker,
+} = require("./services/subscribe.sevice");
 
 const port = process.env.SERVER_PORT || process.env.PORT || 2022;
 
@@ -31,13 +35,16 @@ app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Origin", "*");
 	next();
 });
+app.use("/*", (req, res, next) => {
+	addLog(req.baseUrl);
+	next();
+});
 
 function handleJSONResponse(res, data) {
 	res.setHeader("Content-Type", "application/json");
 	app.set("json spaces", 4);
 	res.json(data);
 }
-
 app.get("/", async (req, res) => {
 	const org = await getOrg();
 	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(org)));
@@ -68,10 +75,12 @@ app.get("/token-holders", async (req, res) => {
 	const tokenHolders = await getTokenHolders();
 	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(tokenHolders)));
 });
-// initAppsTracker();
-// initVotesTracker();
 
 // Server listening
 server.listen(port, () => {
 	console.log(`listening at ${port} port!!!!`);
 });
+
+// initAppsTracker();
+initVotesTracker();
+// initTokenHoldersTracker();

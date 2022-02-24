@@ -1,17 +1,17 @@
-const { addLog } = require("../helpers");
+const { addLog, isVoteExecuted } = require("../helpers");
 const {
 	connectToOrg,
 	getVotingInstance,
 	describeScript,
 	EMPTY_SCRIPT,
 	getAppsHandler,
-	getVotesHandler,
 	handlerUnsubscribe,
 	getTokensInstance,
 } = require("./dao.service");
 const CircularJSON = require("circular-json");
 
-let org = null; // cache
+var org = null; // cache
+// DAO
 const getOrg = async () => {
 	if (org == null) {
 		org = await connectToOrg();
@@ -31,20 +31,8 @@ const getOrg = async () => {
 	}
 	return org;
 };
-const getToken = async () => {
-	const tokensApp = await getAppByName("token-manager");
-	const tokens = await getTokensInstance(tokensApp);
-	const token = await tokens.token();
-	addLog("Token: " + JSON.stringify(token));
-	return token;
-};
-const getTokenHolders = async () => {
-	const tokensApp = await getAppByName("token-manager");
-	const tokens = await getTokensInstance(tokensApp);
-	const holders = await tokens.holders();
-	addLog("TokenHolders: " + JSON.stringify(holders));
-	return holders;
-};
+
+// APPS in organisation
 const getApps = async () => {
 	const org = await getOrg();
 	const apps = await org.apps();
@@ -72,23 +60,44 @@ const getAppAddress = async (name) => {
 		return { error: err.message };
 	}
 };
+
+// Tokens app
+const getToken = async () => {
+	const tokensApp = await getAppByName("token-manager");
+	const tokens = await getTokensInstance(tokensApp);
+	const token = await tokens.token();
+	addLog("Token: " + JSON.stringify(token));
+	return token;
+};
+const getTokenHolders = async () => {
+	const tokensApp = await getAppByName("token-manager");
+	const tokens = await getTokensInstance(tokensApp);
+	const holders = await tokens.holders();
+	addLog("TokenHolders: " + JSON.stringify(holders));
+	return holders;
+};
+
+// Voting app
 const getVotes = async () => {
 	const votingApp = await getAppByName("voting");
 	const voting = await getVotingInstance(votingApp);
 	const votes = await voting.votes();
 	addLog("Fetched votes: " + votes.length);
-	const castsArr = await Promise.all(
-		votes.map(async (vote) => {
-			return await vote.casts();
-		})
-	);
-	console.log( JSON.parse(CircularJSON.stringify(castsArr)) );
+	// const castsArr = await getCastsForAllVotes(votes);
+	// console.log(JSON.parse(CircularJSON.stringify(castsArr)));
 	return votes;
 };
-const getCastsForVote = async ( vote ) => {
+const getCastsForAllVotes = async (votes) => {
+	return await Promise.all(
+		votes.map(async (vote) => {
+			return await getCastsForVote(vote);
+		})
+	);
+};
+const getCastsForVote = async (vote) => {
 	const casts = await vote.casts();
-	console.log( vote.id );
-	console.log( casts );
+	addLog("Fetched casts info for vote( " + vote.id + "): " + casts.length);
+	addLog(JSON.stringify(casts));
 	return casts;
 };
 const processVote = async (vote) => {
@@ -105,34 +114,19 @@ const processVote = async (vote) => {
 	// 	// console.log(error.message);
 	// 	return vote;
 	// }
-	return vote;
-};
-const initAppsTracker = async () => {
-	const org = await getOrg();
-	getAppsHandler(org).then((apps) => {
-		console.log(apps);
-		addLog("Apps updated: " + apps.length);
-	});
-};
-function callBackForVotes(error, votes) {
-	console.log(error, votes);
-	console.log("data in callback");
-}
-// const initCastingVotesTracker = async (vote:Vote) => {
-
-// };
-const initVotesTracker = async () => {
-	const org = await getOrg();
-	getVotesHandler(org, callBackForVotes);
+	// return vote;
+	const casts = await getCastsForVote( vote );
+	return {...vote, casts}; // AJ - TODO - REMOVE VOTE DETAILS FROM CASTS
 };
 
 module.exports.getOrg = getOrg;
+
 module.exports.getApps = getApps;
 module.exports.getAppByName = getAppByName;
 module.exports.getAppsByAddress = getAppsByAddress;
+
 module.exports.getToken = getToken;
 module.exports.getTokenHolders = getTokenHolders;
+
 module.exports.getVotes = getVotes;
 module.exports.processVote = processVote;
-module.exports.initAppsTracker = initAppsTracker;
-module.exports.initVotesTracker = initVotesTracker;

@@ -40,6 +40,8 @@ If the installation was successful, you should be able to run the following comm
 -   DAO connect using @aragon/connect
 -   Fetch Apps in organisation
 -   Fetch Votes from Voting app
+-   Fetch Token info and TokenHolders from Tokens app
+-   Track apps, votes, casts updates
 
 ## Steps to run
 
