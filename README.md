@@ -1,6 +1,6 @@
 # EffectualDAOTrackService
 
-Api service to track a DAO
+Api service to track a DAO which is created using aragon-client.
 
 ## Prerequisites
 
