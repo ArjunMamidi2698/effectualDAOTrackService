@@ -27,6 +27,7 @@ const initAppsTracker = async () => {
 
 /**
  * Callback function for vote updates. initialize Casts tracker for each updated vote.
+ * This function will be called periodically with updated votes array
  * Takes error, updatedVotes( to log ), prevVotesCount( to verify updated votes info ) as params.
  * Returns prevVotesCount;
  * @param {object} error
@@ -36,6 +37,7 @@ const initAppsTracker = async () => {
  * @returns {number}
  **/
 function callBackForVotes(error, votes, prevVotesCount) {
+	// console.log("checking for votes updates...");
 	if (prevVotesCount == 0 && votes.length > 0) {
 		addLog("Total Votes:" + votes.length);
 		votes.forEach((vote) => {
@@ -70,7 +72,8 @@ const initVotesTracker = async () => {
 };
 
 /**
- * Callback function for casts updates for a vote. Log for any casts update
+ * Callback function for casts updates for a vote. Log for any casts update.
+ * This function will be called periodically with updated casts array
  * Takes error, updatedCasts( to log ), voteId( to Log ), prevCasts( to verify updated casts info ) as params.
  * Returns prevCasts;
  * @param {object} error
@@ -81,6 +84,7 @@ const initVotesTracker = async () => {
  * @returns {object}
  **/
 function callBackForCasts(error, casts, voteId, prevCasts) {
+	// console.log("checking for casts of vote(" + voteId + ") updates...");
 	const castsArr = casts.map((cast) => formatCast(cast));
 	if (JSON.stringify(prevCasts) != JSON.stringify(castsArr)) {
 		console.log("\n\n===============================");
@@ -128,8 +132,9 @@ const initCastsTrackerForVote = async (vote) => {
 			addLog(
 				(formattedVote.result == "Passed" ? "\x1b[32m" : "\x1b[31m") +
 					formattedVote.result +
-					"\x1b[0m\n\n"
+					"\x1b[0m"
 			);
+			console.log("Unsubscribing casts updates of vote(" + vote.id + ")...\n\n");
 			handlerUnsubscribe(castsHandler); // unsubscribe after execution
 		}
 	});
@@ -137,6 +142,7 @@ const initCastsTrackerForVote = async (vote) => {
 
 /**
  * Creates subscription to token-holders updates from tokens app
+ * This callback function will be called periodically with updated tokenHolders array
  *
  **/
 const initTokenHoldersTracker = async () => {
@@ -144,6 +150,7 @@ const initTokenHoldersTracker = async () => {
 	const tokensApp = await getAppByName("token-manager");
 	const tokens = await getTokensInstance(tokensApp);
 	tokens.onHolders({}, (error, tokenHolders) => {
+		// console.log("checking for token holders updates...");
 		if (tokenHoldersCount != tokenHolders.length)
 			addLog("TokenHolders updated: " + tokenHolders.length);
 		tokenHoldersCount = tokenHolders.length;

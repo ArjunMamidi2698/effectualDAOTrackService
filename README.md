@@ -1,6 +1,6 @@
 # EffectualDAOTrackService
 
-Api service to track a DAO which is created using aragon-client.
+Api service to fetch and track a DAO information periodically which is created using aragon-client.
 
 ## Prerequisites
 
@@ -43,7 +43,7 @@ or [AJExample](https://client.aragon.org/#/ajexample.aragonid.eth)( DAO_ADDRESS=
 -   Fetch Apps in organisation
 -   Fetch Votes and Casts-for-Vote from Voting app
 -   Fetch Token info and TokenHolders from Tokens app
--   Track apps, token-holders, votes, casts updates
+-   Periodically Tracking apps, token-holders, votes and casts updates
 
 ## Steps to run
 
