@@ -113,4 +113,4 @@ server port in the .env file should match the curl request port
 https://www.getpostman.com/collections/3fb738300fe5e4173402
 
 ## Demo:
-watch demo video here -> /effectualDAOTrackService/effectualDAOTrackServiceImpl.mp4
+watch demo video here -> https://github.com/ArjunMamidi2698/effectualDAOTrackService/blob/main/effectualDAOTrackServiceImpl.mp4
