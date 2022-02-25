@@ -13,7 +13,10 @@ const { getOrg, getAppByName, getTokenHolders } = require("./trackApp.service");
 
 var tokenHoldersCount = 0; // cache
 
-// subscribe to Apps updates
+/**
+ * Creates subscription to apps updates
+ *
+ **/
 const initAppsTracker = async () => {
 	addLog("============Apps Tracker initiated============");
 	const org = await getOrg();
@@ -22,7 +25,16 @@ const initAppsTracker = async () => {
 	});
 };
 
-// subscribe to Votes updates( Voting app )
+/**
+ * Callback function for vote updates. initialize Casts tracker for each updated vote.
+ * Takes error, updatedVotes( to log ), prevVotesCount( to verify updated votes info ) as params.
+ * Returns prevVotesCount;
+ * @param {object} error
+ * @param {Array} votes
+ * @param {number} prevVotesCount
+ *
+ * @returns {number}
+ **/
 function callBackForVotes(error, votes, prevVotesCount) {
 	if (prevVotesCount == 0 && votes.length > 0) {
 		addLog("Total Votes:" + votes.length);
@@ -38,6 +50,10 @@ function callBackForVotes(error, votes, prevVotesCount) {
 	prevVotesCount = votes.length;
 	return prevVotesCount;
 }
+/**
+ * Creates subscription to votes updates from voting app
+ *
+ **/
 const initVotesTracker = async () => {
 	addLog("============Votes Tracker initiated============");
 	const votingApp = await getAppByName("voting");
@@ -53,7 +69,17 @@ const initVotesTracker = async () => {
 	});
 };
 
-// subscribe to Casts updates for a Vote
+/**
+ * Callback function for casts updates for a vote. Log for any casts update
+ * Takes error, updatedCasts( to log ), voteId( to Log ), prevCasts( to verify updated casts info ) as params.
+ * Returns prevCasts;
+ * @param {object} error
+ * @param {Array} casts
+ * @param {string} voteId
+ * @param {object} prevCasts
+ *
+ * @returns {object}
+ **/
 function callBackForCasts(error, casts, voteId, prevCasts) {
 	const castsArr = casts.map((cast) => formatCast(cast));
 	if (JSON.stringify(prevCasts) != JSON.stringify(castsArr)) {
@@ -69,6 +95,13 @@ function callBackForCasts(error, casts, voteId, prevCasts) {
 	prevCasts = castsArr;
 	return prevCasts;
 }
+/**
+ * Creates subscription to casts updates for a vote from voting app.
+ * Log if votes executed and its status. And unsubscibe tracker if vote is executed.
+ * Takes vote as input.
+ * @param {object} vote
+ *
+ **/
 const initCastsTrackerForVote = async (vote) => {
 	addLog(
 		"============Casts Tracker initiated for vote: " +
@@ -102,7 +135,10 @@ const initCastsTrackerForVote = async (vote) => {
 	});
 };
 
-// subscribe to TokenHolders updates( Tokens app )
+/**
+ * Creates subscription to token-holders updates from tokens app
+ *
+ **/
 const initTokenHoldersTracker = async () => {
 	addLog("============Tokens Tracker initiated============");
 	const tokensApp = await getAppByName("token-manager");

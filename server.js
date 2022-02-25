@@ -35,20 +35,26 @@ app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Origin", "*");
 	next();
 });
-app.use("/*", (req, res, next) => {
+// middleware to log every routr
+app.use("/*", function route(req, res, next) {
 	addLog(req.baseUrl);
 	next();
 });
 
+// json format response
 function handleJSONResponse(res, data) {
 	res.setHeader("Content-Type", "application/json");
 	app.set("json spaces", 4);
 	res.json(data);
 }
+
+// getOrganisation
 app.get("/", async (req, res) => {
 	const org = await getOrg();
 	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(org)));
 });
+
+// get apps for organisation and name,address are query params where list can be filtered by param
 app.get("/apps", async (req, res) => {
 	let apps = [];
 	var name = req.query["name"];
@@ -59,6 +65,8 @@ app.get("/apps", async (req, res) => {
 	else apps = await getApps();
 	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(apps)));
 });
+
+// get votes from voting app
 app.get("/votes", async (req, res) => {
 	const votes = await getVotes();
 	const processedVotes = await Promise.all(
@@ -67,10 +75,13 @@ app.get("/votes", async (req, res) => {
 	processedVotes.reverse();
 	handleJSONResponse(res, processedVotes);
 });
+
+// get token details from tokens app
 app.get("/token", async (req, res) => {
 	const token = await getToken();
 	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(token)));
 });
+// get all tokenHolders list
 app.get("/token-holders", async (req, res) => {
 	const tokenHolders = await getTokenHolders();
 	handleJSONResponse(res, JSON.parse(CircularJSON.stringify(tokenHolders)));
@@ -81,6 +92,7 @@ server.listen(port, () => {
 	console.log(`listening at ${port} port!!!!`);
 });
 
+// Trackers: Log Updates
 // initAppsTracker();
 initVotesTracker();
 // initTokenHoldersTracker();
