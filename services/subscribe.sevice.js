@@ -5,7 +5,6 @@ const {
 	formatVote,
 } = require("../helpers");
 const {
-	getAppsHandler,
 	getVotingInstance,
 	getTokensInstance,
 	handlerUnsubscribe,
@@ -18,9 +17,8 @@ var tokenHoldersCount = 0; // cache
 const initAppsTracker = async () => {
 	addLog("============Apps Tracker initiated============");
 	const org = await getOrg();
-	getAppsHandler(org).then((apps) => {
-		console.log(apps);
-		addLog("Apps updated: " + apps.length);
+	org.onApps(null, (error, app) => {
+		addLog("Apps updated: " + app);
 	});
 };
 
@@ -56,17 +54,20 @@ const initVotesTracker = async () => {
 };
 
 // subscribe to Casts updates for a Vote
-function callBackForCasts(error, casts, voteId) {
-	// console.log(error);
-	// AJ - TODO - LOG ALL CASTS DETAILS( PROCESS CASTS )
-	console.log("\n\n===============================");
-	addLog("Total Casts for vote(" + voteId + "):" + casts?.length);
-	if (casts?.length) {
-		casts.forEach((cast) => {
-			addLog(JSON.stringify(formatCast(cast)));
-		});
+function callBackForCasts(error, casts, voteId, prevCasts) {
+	const castsArr = casts.map((cast) => formatCast(cast));
+	if (JSON.stringify(prevCasts) != JSON.stringify(castsArr)) {
+		console.log("\n\n===============================");
+		addLog("Total Casts for vote(" + voteId + "):" + casts?.length);
+		if (casts?.length) {
+			casts.forEach((cast) => {
+				addLog(JSON.stringify(formatCast(cast)));
+			});
+		}
+		console.log("===============================");
 	}
-	console.log("===============================");
+	prevCasts = castsArr;
+	return prevCasts;
 }
 const initCastsTrackerForVote = async (vote) => {
 	addLog(
@@ -74,9 +75,13 @@ const initCastsTrackerForVote = async (vote) => {
 			vote.id +
 			" ============"
 	);
+	let prevCasts = [];
 	const castsHandler = vote.onCasts({}, (error, casts) => {
 		if (!casts) casts = [];
-		callBackForCasts(error, casts, vote.id);
+		prevCasts = callBackForCasts(error, casts, vote.id, prevCasts);
+		if (casts.length) {
+			vote = casts[casts.length - 1].vote; // updated vote
+		}
 		if (
 			vote.votingPower == vote.yea + vote.nay ||
 			casts.length == tokenHoldersCount
@@ -84,9 +89,13 @@ const initCastsTrackerForVote = async (vote) => {
 			// all tokens voted
 			addLog("100% tokens voted for " + vote.id);
 		}
-		if (isVoteExecuted(vote) || casts.length == 0) {
+		if (isVoteExecuted(vote)) {
+			const formattedVote = formatVote(vote);
+			addLog("Vote Executed: " + JSON.stringify(formattedVote));
 			addLog(
-				"Vote Executed: " + JSON.stringify(formatVote(vote)) + "\n\n"
+				(formattedVote.result == "Passed" ? "\x1b[32m" : "\x1b[31m") +
+					formattedVote.result +
+					"\x1b[0m\n\n"
 			);
 			handlerUnsubscribe(castsHandler); // unsubscribe after execution
 		}

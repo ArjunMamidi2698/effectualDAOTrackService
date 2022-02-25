@@ -1,11 +1,9 @@
-const { addLog, isVoteExecuted } = require("../helpers");
+const { addLog, isVoteExecuted, formatCast } = require("../helpers");
 const {
 	connectToOrg,
 	getVotingInstance,
 	describeScript,
 	EMPTY_SCRIPT,
-	getAppsHandler,
-	handlerUnsubscribe,
 	getTokensInstance,
 } = require("./dao.service");
 const CircularJSON = require("circular-json");
@@ -101,22 +99,9 @@ const getCastsForVote = async (vote) => {
 	return casts;
 };
 const processVote = async (vote) => {
-	// if (vote.script === EMPTY_SCRIPT) return vote;
-	// const apps = await getApps();
-	// try {
-	// 	const transaction = await describeScript(vote.script, apps, "theGraph");
-	// 	// console.log(transaction);
-	// 	const [{ description }] = transaction;
-	// 	// console.log(description, "hhhhhhhhhhhhhhhhhhhhhhhhh");
-	// 	addLog("Added metadata for id( " + vote.id + " ): " + description);
-	// 	return { ...vote, metadata: description };
-	// } catch (error) {
-	// 	// console.log(error.message);
-	// 	return vote;
-	// }
-	// return vote;
 	const casts = await getCastsForVote( vote );
-	return {...vote, casts}; // AJ - TODO - REMOVE VOTE DETAILS FROM CASTS
+	const castsArr = casts.map( cast => formatCast( cast ));
+	return {...vote, castsArr};
 };
 
 module.exports.getOrg = getOrg;

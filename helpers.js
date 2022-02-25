@@ -12,25 +12,33 @@ function addLog(data) {
 function calculateStakePercentage(stake, votingPower) {
 	return (stake / votingPower) * 100;
 }
-const formatVote = (vote) => {
-	return { id: vote.id, result: getVoteResult(vote) ? "Passed" : "Rejected" };
-};
 const formatCast = (cast) => {
 	const { id, supports, stake, vote } = cast;
 	const stakePercentage =
 		calculateStakePercentage(stake, vote.votingPower) + "%";
 	return { id, supports, stake: stakePercentage };
 };
+const formatVote = (vote) => {
+	return { id: vote.id, result: getVoteResult(vote) ? "Passed" : "Rejected" };
+};
 
 function validateTimeout(startDate) {
-	const configuredTimeoutMilSeconds =
-		process.env.CRITERIA_VOTE_TIMEOUT_DAYS * 86400000 +
-		process.env.CRITERIA_VOTE_TIMEOUT_HOURS * 3600000 +
-		process.env.CRITERIA_VOTE_TIMEOUT_MINUTES * 60000;
-	const configuredTimeout = parseInt(startDate) + configuredTimeoutMilSeconds;
-	if (new Date().getTime() >= configuredTimeout) return true;
+	const configuredTimeoutSeconds =
+		process.env.CRITERIA_VOTE_TIMEOUT_DAYS * 86400 +
+		process.env.CRITERIA_VOTE_TIMEOUT_HOURS * 3600 +
+		process.env.CRITERIA_VOTE_TIMEOUT_MINUTES * 60;
+	const configuredTimeout = parseInt(startDate) + configuredTimeoutSeconds; // unix timestamp
+	if (parseInt((new Date().getTime() / 1000).toFixed(0)) >= configuredTimeout)
+		return true;
 	return false;
 }
+const isVoteExecuted = (vote) => {
+	// executed || timeout
+	if (vote.executed) return true; // executed already
+	if (validateTimeout(vote.startDate)) return true; // voting period ends
+	return false;
+};
+
 function validateMinApproval(vote) {
 	const { yea, votingPower, minAcceptQuorum } = vote;
 	const minApprovalAchieved =
@@ -46,14 +54,9 @@ function validateSupport(vote) {
 const getVoteResult = (vote) => {
 	return validateSupport(vote) && validateMinApproval(vote);
 };
-const isVoteExecuted = (vote) => {
-	// executed || timeout
-	if (vote.executed) return true; // executed already
-	if (validateTimeout(vote.startDate)) return true; // voting period ends
-	return false;
-};
+
 module.exports.addLog = addLog;
-module.exports.isVoteExecuted = isVoteExecuted;
 module.exports.formatCast = formatCast;
-module.exports.getVoteResult = getVoteResult;
 module.exports.formatVote = formatVote;
+module.exports.isVoteExecuted = isVoteExecuted;
+module.exports.getVoteResult = getVoteResult;

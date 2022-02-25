@@ -19,10 +19,6 @@ const getVotingInstance = async (votingApp) => {
 	const votingInstance = await connectVoting.default(votingApp, "thegraph");
 	return votingInstance;
 };
-const getAppsHandler = async (org) => {
-	if (org == null) org = await connectToOrg();
-	return org.onApps();
-};
 const handlerUnsubscribe = (handler) => {
 	handler.unsubscribe();
 };
@@ -30,6 +26,5 @@ module.exports.EMPTY_SCRIPT = EMPTY_SCRIPT;
 module.exports.connectToOrg = connectToOrg;
 module.exports.getVotingInstance = getVotingInstance;
 module.exports.describeScript = describeScript;
-module.exports.getAppsHandler = getAppsHandler;
 module.exports.handlerUnsubscribe = handlerUnsubscribe;
 module.exports.getTokensInstance = getTokensInstance;
